@@ -1,0 +1,8 @@
+cf_main_venv/
+app/__pycache__/
+app/services/__pycache__/
+app/__pycache__/
+.vscode/launch.json
+app/__pycache__/
+app/views/__pycache__/
+.venv

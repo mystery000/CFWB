@@ -1,0 +1,660 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Compliance Foundry User Management API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/v1/callback": {
+            "get": {
+                "summary": "Callback API for Gmail with Cognito for login and registration",
+                "description": "Returns a JSON object containing the user's data",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id_token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "token_type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expires_in",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal server error"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Callback"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/verify-captcha": {
+            "post": {
+                "summary": "Verify reCAPTCHA webhook",
+                "description": "Verify reCAPTCHA token and return success or failure",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyCaptchaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyCaptchaResponseFailed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/delete-user-data/{Scan UUID}": {
+            "delete": {
+                "summary": "Delete user data",
+                "description": "Delete user data from database",
+                "parameters": [
+                    {
+                        "name": "Scan UUID",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteUserDataResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user_subscription": {
+            "post": {
+                "summary": "Stripe session genrator",
+                "description": "Subscribing User to a monthly subscription from Stripe",
+                "parameters": [
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSubscriptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSubscriptionResponseFailed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/subscriptions": {
+            "get": {
+                "summary": "Get all subscriptions",
+                "description": "Get all subscriptions",
+                "parameters": [
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Subscriptions"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user_subscription/{User ID}": {
+            "get": {
+                "summary": "Get user subscription",
+                "description": "Get user subscription",
+                "parameters": [
+                    {
+                        "name": "User ID",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSubscription"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user_payment_history/{User ID}": {
+            "get": {
+                "summary": "Get user payment history",
+                "description": "Get user payment history",
+                "parameters": [
+                    {
+                        "name": "User ID",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserPaymentHistory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/generate-license-key": {
+            "post": {
+                "summary": "Generate license key",
+                "description": "Generate license key",
+                "parameters": [
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GenerateLicenseKeyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerateLicenseKeyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/retrieve-license-key": {
+            "get": {
+                "summary": "Retrieve license key",
+                "description": "Retrieve license key",
+                "parameters": [
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RetrieveLicenseKeyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Revoke and retrieve new license key",
+                "description": "Revoke and retrieve new license key, no parameter or json body required",
+                "parameters": [
+                    {
+                        "name": "cf-token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RetrieveLicenseKeyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/authenticate-license-key": {
+            "post": {
+                "summary": "Authenticate license key",
+                "description": "Authenticate license key",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthenticateLicenseKeyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticateLicenseKeyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Callback": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "access_token": {
+                        "type": "string"
+                    }
+                }
+            },
+            "VerifyCaptchaResponseFailed": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "VerifyCaptchaResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "DeleteUserDataResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "object"
+                    }
+                }
+            },
+            "UserPaymentHistory": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "transaction_id": {
+                                "type": "string"
+                            },
+                            "stripe_customer": {
+                                "type": "string"
+                            },
+                            "stripe_data": {
+                                "type": "object"
+                            },
+                            "user": {
+                                "type": "object"
+                            },
+                            "subscription": {
+                                "type": "object"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "created_at": {
+                                "type": "string"
+                            },
+                            "updated_at": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "UserSubscriptionResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "payment_url": {
+                        "type": "string"
+                    },
+                    "user_email": {
+                        "type": "string"
+                    },
+                    "session_id": {
+                        "type": "string"
+                    },
+                    "request_uuid": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserSubscription": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "expiry": {
+                                "type": "string"
+                            },
+                            "last_payment": {
+                                "type": "string"
+                            },
+                            "user": {
+                                "type": "object"
+                            },
+                            "subscription": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            },
+            "UserSubscriptionResponseFailed": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Subscriptions": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "subscription_amount": {
+                          "type": "string",
+                          "example": "50"
+                        },
+                        "subscription_id": {
+                          "type": "string",
+                          "example": "prod_12345"
+                        },
+                        "subscription_name": {
+                          "type": "string",
+                          "example": "Silver package - 50 p/m"
+                        },
+                        "subscription_product_link": {
+                          "type": "string",
+                          "format": "uri",
+                          "example": "https://buy.stripe.com/test_14k7t66Vg7oF7qE7st"
+                        }
+                      },
+                      "required": ["id", "subscription_amount", "subscription_id", "subscription_name", "subscription_product_link"]
+                    }
+                  }
+                },
+                "required": ["subscriptions"]
+            },
+            "GenerateLicenseKeyRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    }
+                },
+                "required": ["email"]
+            },
+            "GenerateLicenseKeyResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "RetrieveLicenseKeyResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "license_key": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email"
+                            }
+                        }
+                    }
+                }
+            },
+            "AuthenticateLicenseKeyRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "license_key": {
+                        "type": "string"
+                    }
+                },
+                "required": ["email"]
+            },
+            "AuthenticateLicenseKeyResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
